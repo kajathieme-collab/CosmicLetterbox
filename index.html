@@ -1,942 +1,350 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>📮 Cosmic Letterbox — Send a Message to the Universe</title>
-    <style>
-        /* Import pixel-style font */
-        @import url('https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap');
-        
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
-        
-        body {
-            font-family: 'Press Start 2P', monospace;
-            background: linear-gradient(180deg, #0a0e27 0%, #1a1b3e 30%, #2d1b4e 60%, #1a0f2e 100%);
-            min-height: 100vh;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            padding: 20px;
-            position: relative;
-            overflow-x: hidden;
-        }
-        
-        /* Milky Way band */
-        .milky-way {
-            position: fixed;
-            top: -10%;
-            left: -10%;
-            width: 120%;
-            height: 120%;
-            pointer-events: none;
-            z-index: 0;
-            opacity: 0.6;
-            animation: milkyRotate 120s linear infinite;
-        }
-        
-        .milky-way::before {
-            content: '';
-            position: absolute;
-            top: 40%;
-            left: -20%;
-            right: -20%;
-            height: 200px;
-            background: radial-gradient(ellipse at center, 
-                rgba(138, 180, 248, 0.3) 0%,
-                rgba(138, 180, 248, 0.15) 30%,
-                rgba(138, 180, 248, 0.05) 60%,
-                transparent 100%);
-            transform: rotate(-20deg);
-            filter: blur(3px);
-        }
-        
-        @keyframes milkyRotate {
-            from { transform: rotate(0deg); }
-            to { transform: rotate(360deg); }
-        }
-        
-        /* Enhanced starfield background */
-        .starfield {
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            pointer-events: none;
-            z-index: 1;
-        }
-        
-        .star {
-            position: absolute;
-            background: white;
-            animation: twinkle var(--duration) infinite;
-        }
-        
-        .star.tiny {
-            width: 1px;
-            height: 1px;
-            box-shadow: 0 0 2px rgba(255, 255, 255, 0.8);
-        }
-        
-        .star.small {
-            width: 2px;
-            height: 2px;
-            box-shadow: 0 0 4px rgba(255, 255, 255, 0.8);
-        }
-        
-        .star.medium {
-            width: 3px;
-            height: 3px;
-            box-shadow: 0 0 6px rgba(200, 220, 255, 0.9);
-        }
-        
-        .star.large {
-            width: 4px;
-            height: 4px;
-            box-shadow: 0 0 8px rgba(160, 215, 255, 1);
-        }
-        
-        /* Pixel sparkle stars */
-        .star.sparkle {
-            width: 6px;
-            height: 6px;
-            background: transparent;
-            box-shadow: none;
-        }
-        
-        .star.sparkle::before,
-        .star.sparkle::after {
-            content: '';
-            position: absolute;
-            background: #fff;
-        }
-        
-        .star.sparkle::before {
-            width: 6px;
-            height: 2px;
-            top: 2px;
-            left: 0;
-        }
-        
-        .star.sparkle::after {
-            width: 2px;
-            height: 6px;
-            top: 0;
-            left: 2px;
-        }
-        
-        @keyframes twinkle {
-            0%, 100% { opacity: 0.3; transform: scale(1); }
-            50% { opacity: 1; transform: scale(1.2); }
-        }
-        
-        /* Shooting stars */
-        .shooting-star {
-            position: absolute;
-            width: 3px;
-            height: 3px;
-            background: white;
-            border-radius: 50%;
-            box-shadow: 0 0 6px 2px rgba(255, 255, 255, 0.8);
-            animation: shoot var(--shoot-duration) linear var(--shoot-delay) infinite;
-        }
-        
-        @keyframes shoot {
-            0% {
-                transform: translateX(0) translateY(0);
-                opacity: 1;
-            }
-            100% {
-                transform: translateX(300px) translateY(300px);
-                opacity: 0;
-            }
-        }
-        
-        /* Floating planets/asteroids */
-        .cosmic-object {
-            position: absolute;
-            animation: float var(--float-duration) ease-in-out infinite;
-        }
-        
-        .planet {
-            width: 20px;
-            height: 20px;
-            background: linear-gradient(135deg, #ff6b9d 0%, #c44569 100%);
-            border-radius: 50%;
-            box-shadow: 
-                inset -4px -4px 8px rgba(0, 0, 0, 0.4),
-                0 0 15px rgba(255, 107, 157, 0.4);
-        }
-        
-        .asteroid {
-            width: 12px;
-            height: 12px;
-            background: #6c5ce7;
-            clip-path: polygon(30% 0%, 70% 0%, 100% 30%, 100% 70%, 70% 100%, 30% 100%, 0% 70%, 0% 30%);
-            box-shadow: 0 0 10px rgba(108, 92, 231, 0.5);
-        }
-        
-        @keyframes float {
-            0%, 100% { transform: translateY(0px) rotate(0deg); }
-            50% { transform: translateY(-20px) rotate(180deg); }
-        }
-        
-        /* Main container with pixel corners */
-        .container {
-            position: relative;
-            z-index: 2;
-            max-width: 600px;
-            width: 100%;
-            background: rgba(15, 20, 45, 0.95);
-            border: 4px solid #4a5fc1;
-            padding: 30px;
-            box-shadow: 
-                0 0 30px rgba(74, 95, 193, 0.6),
-                inset 0 0 40px rgba(0, 0, 0, 0.5),
-                0 8px 0 #3a4f91,
-                0 12px 20px rgba(0, 0, 0, 0.4);
-            image-rendering: pixelated;
-        }
-        
-        /* Pixel corner decorations */
-        .container::before,
-        .container::after {
-            content: '';
-            position: absolute;
-            width: 12px;
-            height: 12px;
-            background: #4a5fc1;
-        }
-        
-        .container::before {
-            top: -4px;
-            left: -4px;
-            box-shadow: 
-                12px 0 0 #4a5fc1,
-                0 12px 0 #4a5fc1;
-        }
-        
-        .container::after {
-            bottom: -4px;
-            right: -4px;
-            box-shadow: 
-                -12px 0 0 #4a5fc1,
-                0 -12px 0 #4a5fc1;
-        }
-        
-        .title {
-            font-size: clamp(12px, 4vw, 18px);
-            color: #a0d7ff;
-            text-align: center;
-            margin-bottom: 10px;
-            line-height: 1.6;
-            text-shadow: 
-                2px 2px 0 #4a5fc1,
-                0 0 20px rgba(160, 215, 255, 0.8);
-            animation: titlePulse 3s ease-in-out infinite;
-            letter-spacing: 1px;
-        }
-        
-        @keyframes titlePulse {
-            0%, 100% { 
-                text-shadow: 
-                    2px 2px 0 #4a5fc1,
-                    0 0 20px rgba(160, 215, 255, 0.6);
-            }
-            50% { 
-                text-shadow: 
-                    2px 2px 0 #6a7fd1,
-                    0 0 30px rgba(160, 215, 255, 1);
-            }
-        }
-        
-        /* Pixel emoji decorations */
-        .emoji-decoration {
-            text-align: center;
-            font-size: 24px;
-            margin-bottom: 20px;
-            animation: bounce 2s ease-in-out infinite;
-        }
-        
-        @keyframes bounce {
-            0%, 100% { transform: translateY(0); }
-            50% { transform: translateY(-10px); }
-        }
-        
-        .subtitle {
-            font-size: clamp(8px, 2vw, 10px);
-            color: #7b8fc7;
-            text-align: center;
-            margin-bottom: 25px;
-            line-height: 1.8;
-            text-shadow: 1px 1px 0 rgba(0, 0, 0, 0.5);
-        }
-        
-        /* Input section with pixel border */
-        .input-section {
-            margin-bottom: 20px;
-            position: relative;
-        }
-        
-        .input-wrapper {
-            position: relative;
-            padding: 3px;
-            background: linear-gradient(135deg, #4a5fc1 0%, #6b4fc1 100%);
-        }
-        
-        .message-input {
-            width: 100%;
-            min-height: 150px;
-            background: rgba(10, 14, 39, 0.95);
-            border: 3px solid #2a3f81;
-            color: #a0d7ff;
-            font-family: 'Press Start 2P', monospace;
-            font-size: clamp(8px, 2vw, 10px);
-            padding: 15px;
-            resize: vertical;
-            outline: none;
-            transition: all 0.3s ease;
-            box-shadow: 
-                inset 0 0 20px rgba(0, 0, 0, 0.7),
-                inset 4px 4px 0 rgba(74, 95, 193, 0.3);
-            line-height: 1.6;
-        }
-        
-        .message-input::placeholder {
-            color: #4a5fc1;
-            opacity: 0.7;
-        }
-        
-        .message-input:focus {
-            border-color: #4a5fc1;
-            box-shadow: 
-                inset 0 0 20px rgba(0, 0, 0, 0.7),
-                0 0 20px rgba(74, 95, 193, 0.8);
-        }
-        
-        .char-count {
-            font-size: 8px;
-            color: #7b8fc7;
-            text-align: right;
-            margin-top: 8px;
-            text-shadow: 1px 1px 0 rgba(0, 0, 0, 0.5);
-        }
-        
-        /* Pixel-art send button */
-        .send-button {
-            width: 100%;
-            padding: 18px;
-            background: linear-gradient(180deg, #ff6b9d 0%, #c44569 100%);
-            border: none;
-            color: #ffffff;
-            font-family: 'Press Start 2P', monospace;
-            font-size: clamp(10px, 2.5vw, 12px);
-            cursor: pointer;
-            position: relative;
-            text-shadow: 2px 2px 0 rgba(0, 0, 0, 0.4);
-            transition: all 0.1s ease;
-            box-shadow: 
-                0 6px 0 #8e3055,
-                0 8px 10px rgba(0, 0, 0, 0.4);
-        }
-        
-        .send-button::before {
-            content: '✨ ';
-        }
-        
-        .send-button::after {
-            content: ' ✨';
-        }
-        
-        .send-button:hover:not(:disabled) {
-            background: linear-gradient(180deg, #ff7bad 0%, #d44579 100%);
-            transform: translateY(-2px);
-            box-shadow: 
-                0 8px 0 #8e3055,
-                0 10px 15px rgba(0, 0, 0, 0.4);
-        }
-        
-        .send-button:active:not(:disabled) {
-            transform: translateY(4px);
-            box-shadow: 
-                0 2px 0 #8e3055,
-                0 3px 5px rgba(0, 0, 0, 0.4);
-        }
-        
-        .send-button:disabled {
-            opacity: 0.6;
-            cursor: not-allowed;
-            animation: pulse 1.5s ease-in-out infinite;
-        }
-        
-        @keyframes pulse {
-            0%, 100% { opacity: 0.6; }
-            50% { opacity: 0.8; }
-        }
-        
-        /* Enhanced loading animation */
-        .loading {
-            display: none;
-            text-align: center;
-            margin: 30px 0;
-        }
-        
-        .loading.active {
-            display: block;
-        }
-        
-        .loading-text {
-            font-size: 10px;
-            color: #a0d7ff;
-            margin-bottom: 20px;
-            animation: colorShift 2s ease-in-out infinite;
-        }
-        
-        @keyframes colorShift {
-            0%, 100% { color: #a0d7ff; }
-            50% { color: #ff6b9d; }
-        }
-        
-        .loading-stars {
-            display: flex;
-            justify-content: center;
-            gap: 15px;
-            margin-bottom: 15px;
-        }
-        
-        .loading-star {
-            width: 20px;
-            height: 20px;
-            background: #ffd700;
-            position: relative;
-            animation: spinGrow 1.5s ease-in-out infinite;
-        }
-        
-        .loading-star::before,
-        .loading-star::after {
-            content: '';
-            position: absolute;
-            background: #ffd700;
-        }
-        
-        .loading-star::before {
-            width: 20px;
-            height: 6px;
-            top: 7px;
-            left: 0;
-        }
-        
-        .loading-star::after {
-            width: 6px;
-            height: 20px;
-            top: 0;
-            left: 7px;
-        }
-        
-        .loading-star:nth-child(2) {
-            animation-delay: 0.2s;
-        }
-        
-        .loading-star:nth-child(3) {
-            animation-delay: 0.4s;
-        }
-        
-        @keyframes spinGrow {
-            0%, 100% { 
-                transform: rotate(0deg) scale(1); 
-                opacity: 1; 
-            }
-            50% { 
-                transform: rotate(180deg) scale(1.3); 
-                opacity: 0.7; 
-            }
-        }
-        
-        .loading-orbit {
-            width: 100px;
-            height: 100px;
-            margin: 0 auto;
-            position: relative;
-        }
-        
-        .orbit-planet {
-            width: 12px;
-            height: 12px;
-            background: #6b4fc1;
-            border-radius: 50%;
-            position: absolute;
-            top: 50%;
-            left: 50%;
-            margin: -6px 0 0 -6px;
-            animation: orbit 2s linear infinite;
-            box-shadow: 0 0 10px rgba(107, 79, 193, 0.8);
-        }
-        
-        @keyframes orbit {
-            from { transform: rotate(0deg) translateX(40px) rotate(0deg); }
-            to { transform: rotate(360deg) translateX(40px) rotate(-360deg); }
-        }
-        
-        /* Response section with pixel style */
-        .response-section {
-            display: none;
-            margin-top: 30px;
-            padding: 20px;
-            background: rgba(10, 14, 39, 0.95);
-            border: 4px solid #ffd700;
-            animation: slideIn 0.5s ease-out;
-            box-shadow: 
-                0 0 30px rgba(255, 215, 0, 0.4),
-                inset 0 0 20px rgba(0, 0, 0, 0.5);
-        }
-        
-        .response-section.active {
-            display: block;
-        }
-        
-        @keyframes slideIn {
-            from { 
-                opacity: 0; 
-                transform: translateY(30px) scale(0.95); 
-            }
-            to { 
-                opacity: 1; 
-                transform: translateY(0) scale(1); 
-            }
-        }
-        
-        .response-title {
-            font-size: clamp(10px, 2.5vw, 12px);
-            color: #ffd700;
-            text-align: center;
-            margin-bottom: 15px;
-            text-shadow: 
-                2px 2px 0 #b8860b,
-                0 0 15px rgba(255, 215, 0, 0.8);
-            animation: shimmer 2s ease-in-out infinite;
-        }
-        
-        @keyframes shimmer {
-            0%, 100% { text-shadow: 2px 2px 0 #b8860b, 0 0 15px rgba(255, 215, 0, 0.6); }
-            50% { text-shadow: 2px 2px 0 #daa520, 0 0 25px rgba(255, 215, 0, 1); }
-        }
-        
-        .response-text {
-            font-size: clamp(8px, 2vw, 10px);
-            color: #a0d7ff;
-            line-height: 2;
-            white-space: pre-wrap;
-            word-wrap: break-word;
-            text-shadow: 1px 1px 0 rgba(0, 0, 0, 0.5);
-        }
-        
-        /* Pixel typewriter cursor */
-        .cursor {
-            display: inline-block;
-            width: 10px;
-            height: 14px;
-            background: #a0d7ff;
-            animation: blink 0.8s infinite;
-            margin-left: 4px;
-            box-shadow: 0 0 5px rgba(160, 215, 255, 0.8);
-        }
-        
-        @keyframes blink {
-            0%, 50% { opacity: 1; }
-            51%, 100% { opacity: 0; }
-        }
-        
-        /* Enhanced error message */
-        .error-message {
-            display: none;
-            margin-top: 15px;
-            padding: 15px;
-            background: rgba(193, 74, 74, 0.3);
-            border: 3px solid #c14a4a;
-            color: #ff8888;
-            font-size: 9px;
-            text-align: center;
-            line-height: 1.8;
-            text-shadow: 1px 1px 0 rgba(0, 0, 0, 0.5);
-            animation: shake 0.5s ease-in-out;
-        }
-        
-        .error-message.active {
-            display: block;
-        }
-        
-        @keyframes shake {
-            0%, 100% { transform: translateX(0); }
-            25% { transform: translateX(-5px); }
-            75% { transform: translateX(5px); }
-        }
-        
-        /* Pixel decorative elements */
-        .pixel-heart {
-            display: inline-block;
-            width: 10px;
-            height: 10px;
-            background: #ff6b9d;
-            position: relative;
-            transform: rotate(45deg);
-            animation: heartbeat 1.5s ease-in-out infinite;
-            margin: 0 5px;
-        }
-        
-        .pixel-heart::before,
-        .pixel-heart::after {
-            content: '';
-            position: absolute;
-            width: 10px;
-            height: 10px;
-            background: #ff6b9d;
-        }
-        
-        .pixel-heart::before {
-            top: -5px;
-            left: 0;
-        }
-        
-        .pixel-heart::after {
-            top: 0;
-            left: -5px;
-        }
-        
-        @keyframes heartbeat {
-            0%, 100% { transform: rotate(45deg) scale(1); }
-            50% { transform: rotate(45deg) scale(1.2); }
-        }
-        
-        /* Footer disclaimer */
-        .footer-note {
-            margin-top: 25px;
-            padding-top: 20px;
-            border-top: 2px solid rgba(74, 95, 193, 0.3);
-            font-size: 7px;
-            color: #5a6fa7;
-            text-align: center;
-            line-height: 1.8;
-            opacity: 0.8;
-            text-shadow: 1px 1px 0 rgba(0, 0, 0, 0.3);
-        }
-        
-        /* Responsive adjustments */
-        @media (max-width: 600px) {
-            .container {
-                padding: 20px;
-            }
-            
-            .message-input {
-                min-height: 120px;
-            }
-            
-            .shooting-star {
-                display: none;
-            }
-            
-            .footer-note {
-                font-size: 6px;
-            }
-        }
-    </style>
+  <meta charset="utf-8" />
+  <meta
+    name="viewport"
+    content="width=device-width, initial-scale=1, viewport-fit=cover"
+  />
+  <title>📮 Cosmic Letterbox — Send a Message to the Universe</title>
+  <meta name="referrer" content="no-referrer" />
+  <meta http-equiv="X-Content-Type-Options" content="nosniff" />
+  <meta http-equiv="Cross-Origin-Opener-Policy" content="same-origin" />
+  <meta http-equiv="Cross-Origin-Resource-Policy" content="cross-origin" />
+  <style>
+    @import url("https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap");
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    :root { --tap: 44px; }
+    body {
+      font-family: "Press Start 2P", monospace;
+      background: linear-gradient(180deg, #0a0e27 0%, #1a1b3e 30%, #2d1b4e 60%, #1a0f2e 100%);
+      min-height: 100svh; display: flex; justify-content: center; align-items: center;
+      padding: 20px; position: relative; overflow-x: hidden;
+      padding-left: max(20px, env(safe-area-inset-left));
+      padding-right: max(20px, env(safe-area-inset-right));
+      padding-top: max(20px, env(safe-area-inset-top));
+      padding-bottom: max(20px, env(safe-area-inset-bottom));
+    }
+
+    .milky-way { position: fixed; top: -10%; left: -10%; width: 120%; height: 120%; pointer-events: none; z-index: 0; opacity: .6; animation: milkyRotate 120s linear infinite; }
+    .milky-way::before {
+      content: ""; position: absolute; top: 40%; left: -20%; right: -20%; height: 200px;
+      background: radial-gradient(ellipse at center, rgba(138,180,248,.3) 0%, rgba(138,180,248,.15) 30%, rgba(138,180,248,.05) 60%, transparent 100%);
+      transform: rotate(-20deg); filter: blur(3px);
+    }
+    @keyframes milkyRotate { from { transform: rotate(0) } to { transform: rotate(360deg) } }
+
+    .starfield { position: fixed; inset: 0; pointer-events:none; z-index:1; }
+    .star { position:absolute; background:#fff; animation: twinkle var(--duration) infinite; }
+    .star.tiny{ width:1px;height:1px; box-shadow:0 0 2px rgba(255,255,255,.8) }
+    .star.small{ width:2px;height:2px; box-shadow:0 0 4px rgba(255,255,255,.8) }
+    .star.medium{ width:3px;height:3px; box-shadow:0 0 6px rgba(200,220,255,.9) }
+    .star.large{ width:4px;height:4px; box-shadow:0 0 8px rgba(160,215,255,1) }
+    .star.sparkle{ width:6px;height:6px;background:transparent; box-shadow:none }
+    .star.sparkle::before,.star.sparkle::after{ content:""; position:absolute; background:#fff }
+    .star.sparkle::before{ width:6px;height:2px; top:2px; left:0 }
+    .star.sparkle::after{ width:2px;height:6px; top:0; left:2px }
+    @keyframes twinkle { 0%,100%{ opacity:.3; transform:scale(1) } 50%{ opacity:1; transform:scale(1.2) } }
+
+    .shooting-star { position:absolute; width:3px;height:3px; background:#fff; border-radius:50%;
+      box-shadow:0 0 6px 2px rgba(255,255,255,.8); animation: shoot var(--shoot-duration) linear var(--shoot-delay) infinite; }
+    @keyframes shoot { 0%{ transform:translate(0,0); opacity:1 } 100%{ transform:translate(300px,300px); opacity:0 } }
+
+    .cosmic-object{ position:absolute; animation: float var(--float-duration) ease-in-out infinite; }
+    .planet{ width:20px;height:20px; background:linear-gradient(135deg,#ff6b9d 0%,#c44569 100%); border-radius:50%;
+      box-shadow: inset -4px -4px 8px rgba(0,0,0,.4), 0 0 15px rgba(255,107,157,.4) }
+    .asteroid{ width:12px;height:12px;background:#6c5ce7; clip-path: polygon(30% 0%,70% 0%,100% 30%,100% 70%,70% 100%,30% 100%,0% 70%,0% 30%); box-shadow:0 0 10px rgba(108,92,231,.5) }
+    @keyframes float { 0%,100%{ transform:translateY(0) rotate(0) } 50%{ transform:translateY(-20px) rotate(180deg) } }
+
+    .container{
+      position:relative; z-index:2; max-width:600px; width:100%; background:rgba(15,20,45,.95);
+      border:4px solid #4a5fc1; padding:30px;
+      box-shadow:0 0 30px rgba(74,95,193,.6), inset 0 0 40px rgba(0,0,0,.5), 0 8px 0 #3a4f91, 0 12px 20px rgba(0,0,0,.4);
+      image-rendering: pixelated;
+    }
+    .container::before,.container::after{ content:""; position:absolute; width:12px;height:12px;background:#4a5fc1 }
+    .container::before{ top:-4px; left:-4px; box-shadow:12px 0 0 #4a5fc1, 0 12px 0 #4a5fc1 }
+    .container::after{ bottom:-4px; right:-4px; box-shadow:-12px 0 0 #4a5fc1, 0 -12px 0 #4a5fc1 }
+
+    .emoji-decoration{ text-align:center; font-size:24px; margin-bottom:20px; animation:bounce 2s ease-in-out infinite }
+    @keyframes bounce { 0%,100%{ transform:translateY(0) } 50%{ transform:translateY(-10px) } }
+
+    .title{
+      font-size: clamp(12px, 4vw, 18px); color:#a0d7ff; text-align:center; margin-bottom:10px; line-height:1.6;
+      text-shadow:2px 2px 0 #4a5fc1, 0 0 20px rgba(160,215,255,.8);
+      animation:titlePulse 3s ease-in-out infinite; letter-spacing:1px;
+    }
+    @keyframes titlePulse { 0%,100%{ text-shadow:2px 2px 0 #4a5fc1, 0 0 20px rgba(160,215,255,.6) } 50%{ text-shadow:2px 2px 0 #6a7fd1, 0 0 30px rgba(160,215,255,1) } }
+
+    .subtitle{ font-size:clamp(8px,2vw,10px); color:#7b8fc7; text-align:center; margin-bottom:25px; line-height:1.8; text-shadow:1px 1px 0 rgba(0,0,0,.5) }
+
+    .input-section{ margin-bottom:20px; position:relative }
+    .input-wrapper{ position:relative; padding:3px; background:linear-gradient(135deg,#4a5fc1 0%,#6b4fc1 100%) }
+    .message-input{
+      width:100%; min-height:150px; background:rgba(10,14,39,.95); border:3px solid #2a3f81; color:#a0d7ff;
+      font-family:"Press Start 2P", monospace; font-size:clamp(8px,2vw,10px); padding:15px; resize:vertical; outline:none;
+      transition:all .3s ease; box-shadow: inset 0 0 20px rgba(0,0,0,.7), inset 4px 4px 0 rgba(74,95,193,.3); line-height:1.6;
+    }
+    .message-input::placeholder{ color:#4a5fc1; opacity:.7 }
+    .message-input:focus{ border-color:#4a5fc1; box-shadow: inset 0 0 20px rgba(0,0,0,.7), 0 0 20px rgba(74,95,193,.8) }
+    .char-count{ font-size:8px; color:#7b8fc7; text-align:right; margin-top:8px; text-shadow:1px 1px 0 rgba(0,0,0,.5) }
+
+    .send-button{
+      width:100%; padding:18px; background:linear-gradient(180deg,#ff6b9d 0%,#c44569 100%); border:none; color:#fff;
+      font-family:"Press Start 2P", monospace; font-size:clamp(10px,2.5vw,12px); cursor:pointer; position:relative;
+      text-shadow:2px 2px 0 rgba(0,0,0,.4); transition:all .1s ease; box-shadow:0 6px 0 #8e3055, 0 8px 10px rgba(0,0,0,.4);
+      min-height: var(--tap);
+    }
+    .send-button::before{ content:"✨ " } .send-button::after{ content:" ✨" }
+    .send-button:hover:not(:disabled){ background:linear-gradient(180deg,#ff7bad 0%,#d44579 100%); transform:translateY(-2px); box-shadow:0 8px 0 #8e3055, 0 10px 15px rgba(0,0,0,.4) }
+    .send-button:active:not(:disabled){ transform:translateY(4px); box-shadow:0 2px 0 #8e3055, 0 3px 5px rgba(0,0,0,.4) }
+    .send-button:disabled{ opacity:.6; cursor:not-allowed; animation:pulse 1.5s ease-in-out infinite }
+    @keyframes pulse{ 0%,100%{ opacity:.6 } 50%{ opacity:.8 } }
+
+    .loading{ display:none; text-align:center; margin:30px 0 }
+    .loading.active{ display:block }
+    .loading-text{ font-size:10px; color:#a0d7ff; margin-bottom:20px; animation: colorShift 2s ease-in-out infinite }
+    @keyframes colorShift{ 0%,100%{ color:#a0d7ff } 50%{ color:#ff6b9d } }
+    .loading-stars{ display:flex; justify-content:center; gap:15px; margin-bottom:15px }
+    .loading-star{ width:20px;height:20px;background:#ffd700; position:relative; animation: spinGrow 1.5s ease-in-out infinite }
+    .loading-star::before,.loading-star::after{ content:""; position:absolute; background:#ffd700 }
+    .loading-star::before{ width:20px;height:6px; top:7px; left:0 }
+    .loading-star::after{ width:6px;height:20px; top:0; left:7px }
+    .loading-star:nth-child(2){ animation-delay:.2s } .loading-star:nth-child(3){ animation-delay:.4s }
+    @keyframes spinGrow{ 0%,100%{ transform:rotate(0) scale(1); opacity:1 } 50%{ transform:rotate(180deg) scale(1.3); opacity:.7 } }
+    .loading-orbit{ width:100px;height:100px;margin:0 auto; position:relative }
+    .orbit-planet{ width:12px;height:12px;background:#6b4fc1;border-radius:50%; position:absolute; top:50%; left:50%; margin:-6px 0 0 -6px; animation: orbit 2s linear infinite; box-shadow:0 0 10px rgba(107,79,193,.8) }
+    @keyframes orbit{ from{ transform: rotate(0) translateX(40px) rotate(0) } to{ transform: rotate(360deg) translateX(40px) rotate(-360deg) } }
+
+    .response-section{ display:none; margin-top:30px; padding:20px; background:rgba(10,14,39,.95); border:4px solid #ffd700; animation: slideIn .5s ease-out;
+      box-shadow: 0 0 30px rgba(255,215,0,.4), inset 0 0 20px rgba(0,0,0,.5)
+    }
+    .response-section.active{ display:block }
+    @keyframes slideIn{ from{ opacity:0; transform:translateY(30px) scale(.95) } to{ opacity:1; transform:translateY(0) scale(1) } }
+    .response-title{ font-size:clamp(10px,2.5vw,12px); color:#ffd700; text-align:center; margin-bottom:15px;
+      text-shadow:2px 2px 0 #b8860b, 0 0 15px rgba(255,215,0,.8); animation: shimmer 2s ease-in-out infinite }
+    @keyframes shimmer{ 0%,100%{ text-shadow:2px 2px 0 #b8860b, 0 0 15px rgba(255,215,0,.6) } 50%{ text-shadow:2px 2px 0 #daa520, 0 0 25px rgba(255,215,0,1) } }
+    .response-text{ font-size:clamp(8px,2vw,10px); color:#a0d7ff; line-height:2; white-space:pre-wrap; word-wrap:break-word; text-shadow:1px 1px 0 rgba(0,0,0,.5) }
+    .cursor{ display:inline-block; width:10px;height:14px;background:#a0d7ff; animation: blink .8s infinite; margin-left:4px; box-shadow:0 0 5px rgba(160,215,255,.8) }
+    @keyframes blink{ 0%,50%{ opacity:1 } 51%,100%{ opacity:0 } }
+
+    .error-message{ display:none; margin-top:15px; padding:15px; background:rgba(193,74,74,.3); border:3px solid #c14a4a; color:#ff8888; font-size:9px; text-align:center; line-height:1.8; text-shadow:1px 1px 0 rgba(0,0,0,.5); animation: shake .5s ease-in-out }
+    .error-message.active{ display:block }
+    @keyframes shake{ 0%,100%{ transform:translateX(0) } 25%{ transform:translateX(-5px) } 75%{ transform:translateX(5px) } }
+
+    .footer-note{ margin-top:25px; padding-top:20px; border-top:2px solid rgba(74,95,193,.3); font-size:7px; color:#5a6fa7; text-align:center; line-height:1.8; opacity:.8; text-shadow:1px 1px 0 rgba(0,0,0,.3) }
+
+    @media (max-width: 600px) {
+      .container { padding:20px }
+      .message-input { min-height:120px }
+      .shooting-star { display:none }
+      .footer-note { font-size:6px }
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+      .milky-way, .star, .shooting-star, .cosmic-object, .emoji-decoration, .title, .loading-text,
+      .loading-star, .orbit-planet, .response-title { animation: none !important }
+    }
+  </style>
 </head>
 <body>
-    <!-- Animated milky way -->
-    <div class="milky-way"></div>
-    
-    <!-- Enhanced starfield -->
-    <div class="starfield" id="starfield"></div>
-    
-    <!-- Cosmic objects -->
-    <div id="cosmicObjects"></div>
-    
-    <!-- Main container -->
-    <div class="container">
-        <div class="emoji-decoration">🌟✨🪐💫</div>
-        <h1 class="title">📮 Cosmic Letterbox<br>Send a Message to the Universe</h1>
-        <p class="subtitle">✦ Your Message to the Cosmos ✦</p>
-        
-        <!-- Input section -->
-        <div class="input-section">
-            <div class="input-wrapper">
-                <textarea 
-                    id="messageInput" 
-                    class="message-input" 
-                    placeholder="Share your thoughts, dreams, or questions with the Universe..."
-                    maxlength="500"
-                ></textarea>
-            </div>
-            <div class="char-count">
-                <span id="charCount">0</span> / 500 characters
-            </div>
-        </div>
-        
-        <!-- Send button -->
-        <button id="sendButton" class="send-button">
-            SEND TO THE COSMOS
-        </button>
-        
-        <!-- Error message -->
-        <div id="errorMessage" class="error-message"></div>
-        
-        <!-- Loading animation -->
-        <div id="loading" class="loading">
-            <div class="loading-text">⋆ Transmitting through the cosmos ⋆</div>
-            <div class="loading-stars">
-                <div class="loading-star"></div>
-                <div class="loading-star"></div>
-                <div class="loading-star"></div>
-            </div>
-            <div class="loading-orbit">
-                <div class="orbit-planet"></div>
-            </div>
-        </div>
-        
-        <!-- Response section -->
-        <div id="responseSection" class="response-section">
-            <div class="response-title">🌌 The Universe Replies 🌌</div>
-            <div id="responseText" class="response-text"></div>
-        </div>
-        
-        <!-- Footer note -->
-        <div class="footer-note">
-            ✦ This is a small, fun project. Responses are AI-generated and should be used as suggestions only. ✦
-        </div>
+  <div class="milky-way"></div>
+  <div class="starfield" id="starfield"></div>
+  <div id="cosmicObjects"></div>
+
+  <div class="container" role="main">
+    <div class="emoji-decoration" aria-hidden="true">🌟✨🪐💫</div>
+    <h1 class="title">📮 Cosmic Letterbox<br/>Send a Message to the Universe</h1>
+    <p class="subtitle">✦ Your Message to the Cosmos ✦</p>
+
+    <div class="input-section">
+      <label for="messageInput" class="sr-only" style="position:absolute;left:-9999px;">Your message</label>
+      <div class="input-wrapper">
+        <textarea id="messageInput" class="message-input" placeholder="Share your thoughts, dreams, or questions with the Universe..." maxlength="500" aria-describedby="count"></textarea>
+      </div>
+      <div class="char-count" id="count"><span id="charCount">0</span> / 500 characters</div>
     </div>
 
-    <script>
-        // ============================================================
-        // CONFIGURATION - Replace these placeholders with actual values
-        // ============================================================
-        const CONFIG = {
-            // Replace with your n8n webhook URL
-            webhookUrl: '{{N8N_WEBHOOK_URL}}',
-            // Replace with your secret key (or use environment variable)
-            secretKey: '{{N8N_SECRET}}'
-        };
-        
-        // ============================================================
-        // Enhanced starfield generation with variety
-        // ============================================================
-        function createStarfield() {
-            const starfield = document.getElementById('starfield');
-            const starTypes = [
-                { class: 'tiny', count: 150 },
-                { class: 'small', count: 100 },
-                { class: 'medium', count: 50 },
-                { class: 'large', count: 30 },
-                { class: 'sparkle', count: 20 }
-            ];
-            
-            starTypes.forEach(type => {
-                for (let i = 0; i < type.count; i++) {
-                    const star = document.createElement('div');
-                    star.className = `star ${type.class}`;
-                    star.style.left = Math.random() * 100 + '%';
-                    star.style.top = Math.random() * 100 + '%';
-                    star.style.setProperty('--duration', (1.5 + Math.random() * 4) + 's');
-                    star.style.animationDelay = Math.random() * 3 + 's';
-                    starfield.appendChild(star);
-                }
-            });
-            
-            // Add shooting stars
-            for (let i = 0; i < 5; i++) {
-                const shootingStar = document.createElement('div');
-                shootingStar.className = 'shooting-star';
-                shootingStar.style.left = Math.random() * 50 + '%';
-                shootingStar.style.top = Math.random() * 50 + '%';
-                shootingStar.style.setProperty('--shoot-duration', (3 + Math.random() * 2) + 's');
-                shootingStar.style.setProperty('--shoot-delay', (Math.random() * 5) + 's');
-                starfield.appendChild(shootingStar);
-            }
+    <button id="sendButton" class="send-button">SEND TO THE COSMOS</button>
+
+    <div id="errorMessage" class="error-message" role="alert"></div>
+
+    <div id="loading" class="loading" aria-live="polite">
+      <div class="loading-text">⋆ Transmitting through the cosmos ⋆</div>
+      <div class="loading-stars"><div class="loading-star"></div><div class="loading-star"></div><div class="loading-star"></div></div>
+      <div class="loading-orbit"><div class="orbit-planet"></div></div>
+    </div>
+
+    <div id="responseSection" class="response-section" aria-live="polite">
+      <div class="response-title">🌌 The Universe Replies 🌌</div>
+      <div id="responseText" class="response-text"></div>
+    </div>
+
+    <div class="footer-note">✦ This is a small, fun project. Responses are AI-generated and should be used as suggestions only. ✦</div>
+  </div>
+
+  <script>
+    // ---------------------------
+    // CONFIG — set your Worker URL
+    // ---------------------------
+
+    const PROXY_URL = "https://cosmic-letterbox-proxy.kajathieme.workers.dev/api/cosmic";
+
+    // Starfield & cosmic objects
+    function createStarfield() {
+      const starfield = document.getElementById("starfield");
+      const starTypes = [
+        { class: "tiny", count: 150 },
+        { class: "small", count: 100 },
+        { class: "medium", count: 50 },
+        { class: "large", count: 30 },
+        { class: "sparkle", count: 20 },
+      ];
+      starTypes.forEach((t) => {
+        for (let i = 0; i < t.count; i++) {
+          const star = document.createElement("div");
+          star.className = `star ${t.class}`;
+          star.style.left = Math.random() * 100 + "%";
+          star.style.top = Math.random() * 100 + "%";
+          star.style.setProperty("--duration", 1.5 + Math.random() * 4 + "s");
+          star.style.animationDelay = Math.random() * 3 + "s";
+          starfield.appendChild(star);
         }
-        
-        // ============================================================
-        // Create floating cosmic objects
-        // ============================================================
-        function createCosmicObjects() {
-            const container = document.getElementById('cosmicObjects');
-            const objects = [
-                { type: 'planet', count: 3 },
-                { type: 'asteroid', count: 5 }
-            ];
-            
-            objects.forEach(obj => {
-                for (let i = 0; i < obj.count; i++) {
-                    const element = document.createElement('div');
-                    element.className = `cosmic-object ${obj.type}`;
-                    element.style.left = Math.random() * 90 + '%';
-                    element.style.top = Math.random() * 90 + '%';
-                    element.style.setProperty('--float-duration', (10 + Math.random() * 10) + 's');
-                    element.style.animationDelay = Math.random() * 5 + 's';
-                    element.style.position = 'fixed';
-                    element.style.zIndex = '1';
-                    element.style.pointerEvents = 'none';
-                    container.appendChild(element);
-                }
-            });
+      });
+      for (let i = 0; i < 5; i++) {
+        const s = document.createElement("div");
+        s.className = "shooting-star";
+        s.style.left = Math.random() * 50 + "%";
+        s.style.top = Math.random() * 50 + "%";
+        s.style.setProperty("--shoot-duration", 3 + Math.random() * 2 + "s");
+        s.style.setProperty("--shoot-delay", Math.random() * 5 + "s");
+        starfield.appendChild(s);
+      }
+    }
+    function createCosmicObjects() {
+      const container = document.getElementById("cosmicObjects");
+      const objects = [ { type: "planet", count: 3 }, { type: "asteroid", count: 5 } ];
+      objects.forEach((o) => {
+        for (let i = 0; i < o.count; i++) {
+          const el = document.createElement("div");
+          el.className = `cosmic-object ${o.type}`;
+          el.style.left = Math.random() * 90 + "%";
+          el.style.top = Math.random() * 90 + "%";
+          el.style.setProperty("--float-duration", 10 + Math.random() * 10 + "s");
+          el.style.animationDelay = Math.random() * 5 + "s";
+          el.style.position = "fixed";
+          el.style.zIndex = "1";
+          el.style.pointerEvents = "none";
+          container.appendChild(el);
         }
-        
-        // ============================================================
-        // Character counter
-        // ============================================================
-        const messageInput = document.getElementById('messageInput');
-        const charCount = document.getElementById('charCount');
-        
-        messageInput.addEventListener('input', () => {
-            charCount.textContent = messageInput.value.length;
+      });
+    }
+
+    // Character counter
+    const messageInput = document.getElementById("messageInput");
+    const charCount = document.getElementById("charCount");
+    messageInput.addEventListener("input", () => {
+      charCount.textContent = messageInput.value.length;
+    });
+
+    // Typewriter effect
+    function typewriterEffect(el, text, speed = 35) {
+      return new Promise((resolve) => {
+        let i = 0;
+        el.textContent = "";
+        const cursor = document.createElement("span");
+        cursor.className = "cursor";
+        el.appendChild(cursor);
+        const interval = setInterval(() => {
+          if (i < text.length) {
+            el.insertBefore(document.createTextNode(text[i]), cursor);
+            i++;
+          } else {
+            clearInterval(interval);
+            cursor.remove();
+            resolve();
+          }
+        }, speed);
+      });
+    }
+
+    function showLoading() {
+      document.getElementById("loading").classList.add("active");
+      document.getElementById("errorMessage").classList.remove("active");
+      document.getElementById("responseSection").classList.remove("active");
+    }
+    function hideLoading() {
+      document.getElementById("loading").classList.remove("active");
+    }
+    function showError(msg) {
+      const el = document.getElementById("errorMessage");
+      el.textContent = msg;
+      el.classList.add("active");
+      hideLoading();
+    }
+    function showResponse(text) {
+      hideLoading();
+      const section = document.getElementById("responseSection");
+      const textEl = document.getElementById("responseText");
+      section.classList.add("active");
+      typewriterEffect(textEl, text, 30);
+    }
+
+    async function sendToUniverse() {
+      const msg = messageInput.value.trim();
+      if (!msg) return showError("🌠 Please write a message before sending it to the cosmos!");
+      if (msg.length > 500) return showError("Message too long (max 500 chars).");
+
+      const btn = document.getElementById("sendButton");
+      btn.disabled = true;
+      showLoading();
+
+      const payload = { message: msg };
+
+      // Timeout via AbortController
+      const ctrl = new AbortController();
+      const t = setTimeout(() => ctrl.abort(), 10000);
+
+      try {
+        const res = await fetch(PROXY_URL, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify(payload),
+          signal: ctrl.signal,
+          mode: "cors",
+          credentials: "omit",
         });
-        
-        // ============================================================
-        // Enhanced typewriter effect
-        // ============================================================
-        function typewriterEffect(element, text, speed = 40) {
-            return new Promise((resolve) => {
-                let index = 0;
-                element.textContent = '';
-                
-                const cursor = document.createElement('span');
-                cursor.className = 'cursor';
-                element.appendChild(cursor);
-                
-                const interval = setInterval(() => {
-                    if (index < text.length) {
-                        element.insertBefore(
-                            document.createTextNode(text[index]),
-                            cursor
-                        );
-                        index++;
-                    } else {
-                        clearInterval(interval);
-                        cursor.remove();
-                        resolve();
-                    }
-                }, speed);
-            });
+
+        clearTimeout(t);
+
+        if (!res.ok) {
+          throw new Error("Upstream not OK");
         }
-        
-        // ============================================================
-        // Show/hide elements
-        // ============================================================
-        function showLoading() {
-            document.getElementById('loading').classList.add('active');
-            document.getElementById('errorMessage').classList.remove('active');
-            document.getElementById('responseSection').classList.remove('active');
-        }
-        
-        function hideLoading() {
-            document.getElementById('loading').classList.remove('active');
-        }
-        
-        function showError(message) {
-            const errorElement = document.getElementById('errorMessage');
-            errorElement.textContent = message;
-            errorElement.classList.add('active');
-            hideLoading();
-        }
-        
-        function showResponse(text) {
-            hideLoading();
-            const responseSection = document.getElementById('responseSection');
-            const responseText = document.getElementById('responseText');
-            responseSection.classList.add('active');
-            typewriterEffect(responseText, text, 35);
-        }
-        
-        // ============================================================
-        // Send message to n8n webhook
-        // ============================================================
-        async function sendToUniverse() {
-            const message = messageInput.value.trim();
-            
-            // Validation
-            if (!message) {
-                showError('🌠 Please write a message before sending it to the cosmos!');
-                return;
-            }
-            
-            // Check if configuration is set
-            if (CONFIG.webhookUrl.includes('{{') || CONFIG.secretKey.includes('{{')) {
-                showError('⚙️ Configuration error: Webhook URL or secret key not configured.');
-                return;
-            }
-            
-            // Disable button and show loading
-            const sendButton = document.getElementById('sendButton');
-            sendButton.disabled = true;
-            showLoading();
-            
-            try {
-                // Prepare request payload
-                const payload = {
-                    message: message,
-                    timestamp: new Date().toISOString()
-                };
-                
-                // Send POST request to n8n webhook
-                const response = await fetch(CONFIG.webhookUrl, {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json',
-                        'x-secret-key': CONFIG.secretKey
-                    },
-                    body: JSON.stringify(payload)
-                });
-                
-                // Handle non-2xx responses
-                if (!response.ok) {
-                    throw new Error(`HTTP ${response.status}: ${response.statusText}`);
-                }
-                
-                // Parse response
-                const data = await response.json();
-                
-                // Check if response contains a message
-                if (data && data.reply) {
-                    showResponse(data.reply);
-                } else if (data && data.message) {
-                    showResponse(data.message);
-                } else {
-                    throw new Error('No message received from the cosmos');
-                }
-                
-                // Clear input after successful send
-                messageInput.value = '';
-                charCount.textContent = '0';
-                
-            } catch (error) {
-                console.error('Error sending message:', error);
-                showError('🌌 The cosmos is quiet today. Try again later.');
-            } finally {
-                // Re-enable button
-                sendButton.disabled = false;
-            }
-        }
-        
-        // ============================================================
-        // Event listeners
-        // ============================================================
-        document.getElementById('sendButton').addEventListener('click', sendToUniverse);
-        
-        // Allow Enter key to send (Shift+Enter for new line)
-        messageInput.addEventListener('keydown', (e) => {
-            if (e.key === 'Enter' && !e.shiftKey) {
-                e.preventDefault();
-                sendToUniverse();
-            }
-        });
-        
-        // ============================================================
-        // Initialize
-        // ============================================================
-        createStarfield();
-        createCosmicObjects();
-    </script>
+        const data = await res.json().catch(() => ({}));
+        const reply = (data?.reply ?? data?.message ?? "").toString().trim();
+        if (!reply) throw new Error("No reply from cosmos");
+
+        showResponse(reply);
+        messageInput.value = "";
+        charCount.textContent = "0";
+      } catch (e) {
+        console.error(e);
+        showError("🌌 The cosmos is quiet today. Try again later.");
+      } finally {
+        btn.disabled = false;
+      }
+    }
+
+    document.getElementById("sendButton").addEventListener("click", sendToUniverse);
+    messageInput.addEventListener("keydown", (e) => {
+      if (e.key === "Enter" && !e.shiftKey) {
+        e.preventDefault();
+        sendToUniverse();
+      }
+    });
+
+    createStarfield();
+    createCosmicObjects();
+  </script>
 </body>
 </html>
