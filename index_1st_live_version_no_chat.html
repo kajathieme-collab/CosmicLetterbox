@@ -347,22 +347,4 @@
     createCosmicObjects();
   </script>
 </body>
-
-<!-- n8n Chat (CDN) -->
-<link href="https://cdn.jsdelivr.net/npm/@n8n/chat/dist/style.css" rel="stylesheet" />
-<script type="module">
-  import { createChat } from 'https://cdn.jsdelivr.net/npm/@n8n/chat/dist/chat.js';
-
-  // Use your production webhook URL from the n8n node (screenshot shows this exact pattern)
-  createChat({
-    webhookUrl: 'https://n8n.srv1044671.hstgr.cloud/webhook/4533e730-1c3d-42d6-aa52-9f77f75c0cd9/chat',
-    // Optional tweaks:
-    // mode: 'window', // default (floating bubble)
-    // title: 'Cosmic Assistant',
-    // subtitle: 'Ask the Universe ✨',
-    // theme: { primaryColor: '#4a5fc1' },
-  });
-</script>
-
-
 </html>
