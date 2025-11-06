@@ -347,20 +347,60 @@
     createCosmicObjects();
   </script>
 
-<!-- n8n Chat (CDN) -->
+<!-- n8n Chat (diagnostic inline embed) -->
+<style>
+  /* Put chat above any pixel frame/shadows */
+  .n8n-chat-launcher, .n8n-chat-window { z-index: 2147483647 !important; }
+  #n8n-chat-slot { margin: 28px auto 0; max-width: 760px; }
+</style>
+
+<div id="n8n-chat-slot"></div>
+
 <link href="https://cdn.jsdelivr.net/npm/@n8n/chat/dist/style.css" rel="stylesheet" />
 <script type="module">
-  import { createChat } from 'https://cdn.jsdelivr.net/npm/@n8n/chat/dist/chat.js';
+  // 1) Basic boot log
+  console.log("[n8n-chat] booting…");
 
-  // Use your production webhook URL from the n8n node (screenshot shows this exact pattern)
-  createChat({
-    webhookUrl: 'https://n8n.srv1044671.hstgr.cloud/webhook/4533e730-1c3d-42d6-aa52-9f77f75c0cd9/chat',
-    // Optional tweaks:
-    // mode: 'window', // default (floating bubble)
-    // title: 'Cosmic Assistant',
-    // subtitle: 'Ask the Universe ✨',
-    // theme: { primaryColor: '#4a5fc1' },
+  // 2) Surface any runtime errors loudly
+  window.addEventListener('error', (e) => {
+    console.error("[n8n-chat] window error:", e.message, e.error);
   });
+
+  try {
+    const mod = await import('https://cdn.jsdelivr.net/npm/@n8n/chat/dist/chat.js');
+    console.log("[n8n-chat] module loaded:", Object.keys(mod));
+    const { createChat } = mod;
+
+    // 3) Create the chat inline to guarantee it’s on-screen
+    createChat({
+      webhookUrl: 'https://n8n.srv1044671.hstgr.cloud/webhook/4533e730-1c3d-42d6-aa52-9f77f75c0cd9/chat',
+      target: '#n8n-chat-slot',   // render inside this div
+      mode: 'window',             // can be 'fullscreen' too
+      title: 'Cosmic Assistant',
+      subtitle: 'Ask the Universe ✨',
+      theme: { primaryColor: '#4a5fc1' },
+    });
+
+    console.log("[n8n-chat] createChat called");
+  } catch (err) {
+    console.error("[n8n-chat] failed to init:", err);
+    const el = document.getElementById('n8n-chat-slot');
+    if (el) {
+      el.innerHTML = `
+        <div style="padding:12px;border:1px solid #c33;color:#e55;background:#2a0000;border-radius:8px;">
+          <strong>n8n chat failed to load.</strong><br/>
+          <code>${String(err && (err.message || err))}</code>
+        </div>`;
+    }
+  }
+
+  // 4) Optional: quick webhook CORS/ping check (prints status to console)
+  fetch('https://n8n.srv1044671.hstgr.cloud/webhook/4533e730-1c3d-42d6-aa52-9f77f75c0cd9/chat', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ message: 'diagnostic ping' })
+  }).then(r => console.log("[n8n-chat] webhook POST status:", r.status))
+    .catch(e => console.error("[n8n-chat] webhook POST error:", e));
 </script>
 
 </body>
