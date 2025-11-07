@@ -347,10 +347,40 @@
     createCosmicObjects();
   </script>
 
-<!-- n8n Chat (self-hosted assets) -->
-<link href="./assets/n8n-chat/style.css" rel="stylesheet" />
-<div id="n8n-chat"></div>
-<script type="module" src="./assets/n8n-chat/init.js"></script>
+<!-- n8n Chat (bubble with CDN fallback) -->
+<link href="https://cdn.jsdelivr.net/npm/@n8n/chat/dist/style.css" rel="stylesheet" />
+<script type="module">
+	import { createChat } from 'https://cdn.jsdelivr.net/npm/@n8n/chat/dist/chat.bundle.es.js';
+
+  createChat({
+	webhookUrl: 'https://n8n.srv1044671.hstgr.cloud/webhook/4533e730-1c3d-42d6-aa52-9177f75c0cd9/chat',
+	webhookConfig: {
+		method: 'POST',
+		headers: {}
+	},
+	target: '#n8n-chat',
+	mode: 'window',
+	chatInputKey: 'chatInput',
+	chatSessionKey: 'sessionId',
+	loadPreviousSession: true,
+	metadata: {},
+	showWelcomeScreen: false,
+	defaultLanguage: 'en',
+	initialMessages: [
+		'I am your cosmic ordering assistant. Ask me anything about the topic. Shall we get started?'
+	],
+	i18n: {
+		en: {
+			title: 'Universe calling! 🔮', 
+			subtitle: "We're here 24/7.",
+			footer: '',
+			getStarted: 'New Conversation',
+			inputPlaceholder: 'Type your question..',
+		},
+	},
+	enableStreaming: false,
+});
+</script>
 
 
 </body>
