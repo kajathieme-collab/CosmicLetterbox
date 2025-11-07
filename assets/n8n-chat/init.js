@@ -1,4 +1,4 @@
-import { createChat } from './chat.bundle.es.js';
+import { createChat } from 'https://cdn.jsdelivr.net/npm/@n8n/chat/dist/chat.bundle.es.js';
 
 console.info('[CosmicLetterbox] Initializing n8n chat widget');
 
